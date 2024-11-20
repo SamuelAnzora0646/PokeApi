@@ -1,0 +1,46 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Pokémon Finder
+        link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css", integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk", crossorigin="anonymous")
+    body
+        // Contenedor principal
+        div.container.d-flex.flex-column.justify-content-center.align-items-center.mt-5
+            img.logo(src="/logo2.png", alt="Logo Pokémon Finder", class="mb-4 img-fluid", style="max-width: 200px; height: auto;")
+            // Logo más pequeño
+            div.card.p-4.text-center
+                div.card-body
+                    h3.card-title.mb-3 Encuentra tu Pokémon
+                    p.text-muted.mb-3 Ingrese un número de Pokémon para buscar su imagen y nombre.
+                    input#pokemonId.form-control.mb-3(type="text", placeholder="Ingrese el ID del Pokémon")
+                    button#searchButton.btn.btn-danger.btn-block Buscar
+                    img#pokemonImage.pokemon.img-fluid.mt-3(style="max-width: 150px; height: 150px; object-fit: contain;")
+                    p#pokemonInfo.text-dark.mt-3
+                    p#errorMessage(class="text-danger mt-3", style="display:none") Pokémon no encontrado.
+        script.
+            document.getElementById('searchButton').addEventListener('click', () => {
+                const pokemonId = document.getElementById('pokemonId').value;
+                const pokemonImage = document.getElementById('pokemonImage');
+                const pokemonInfo = document.getElementById('pokemonInfo');
+                const errorMessage = document.getElementById('errorMessage');
+                
+                // Ocultar el mensaje de error
+                errorMessage.style.display = 'none';
+                pokemonImage.setAttribute('src', ''); // Limpiar la imagen
+
+                fetch(`/pokemon/${pokemonId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Pokémon no encontrado');
+                        return response.json();
+                    })
+                    .then(data => {
+                        pokemonImage.setAttribute('src', data.sprite);
+                        pokemonInfo.textContent = data.name;
+                    })
+                    .catch(err => {
+                        pokemonInfo.textContent = '';
+                        errorMessage.style.display = 'block'; // Mostrar el mensaje de error
+                    });
+            });
